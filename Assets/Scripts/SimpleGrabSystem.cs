@@ -13,8 +13,10 @@ public class SimpleGrabSystem : MonoBehaviour
     [SerializeField] private Transform slot;
     [SerializeField] private float DropForce;
 
+
     // Reference to the currently held item.
     private PickableItem pickedItem;
+    private bool itemCollected = false;
 
     /// <summary>
     /// Method called very frame.
@@ -42,11 +44,17 @@ public class SimpleGrabSystem : MonoBehaviour
                 {
                     // Check if object is pickable
                     var pickable = hit.transform.GetComponent<PickableItem>();
+                    var collectable = hit.transform.GetComponent<CollectableItem>();
                     
                     // If object has PickableItem class
                     if (pickable)
                     {
-                        Debug.Log($"Pickable: {pickable.name}");
+                        if(collectable && !itemCollected)
+                        {
+                            CollectItem(collectable);
+                        }
+
+                        //Debug.Log($"Pickable: {pickable.name}");
                         // Pick it
                         PickItem(pickable);
                     }
@@ -57,34 +65,39 @@ public class SimpleGrabSystem : MonoBehaviour
         if (Input.GetButtonDown("Fire2"))
         {
             // Check if player picked some item already
-            if (pickedItem)
-            {
-                // If yes, drop picked item
+            if (pickedItem) {
                 TossItem(pickedItem);
-            }
-            else
-            {
-                // If no, try to pick item in front of the player
-                // Create ray from center of the screen
-                //var ray = characterCamera.ViewportPointToRay(Vector3.one * 0.5f);
+            } else {
                 Ray ray = new Ray(player.transform.position, player.transform.forward);
                 RaycastHit hit;
                 // Shot ray to find object to pick
-                if (Physics.Raycast(ray, out hit, 1.5f))
-                {
+                if (Physics.Raycast(ray, out hit, 1.5f)) {
                     // Check if object is pickable
                     var pickable = hit.transform.GetComponent<PickableItem>();
+                    var collectable = hit.transform.GetComponent<CollectableItem>();
                     
                     // If object has PickableItem class
-                    if (pickable)
-                    {
-                        Debug.Log($"Pickable: {pickable.name}");
+                    if (pickable) {
+                        if(collectable && !itemCollected) {
+                            CollectItem(collectable);
+                        }
+                        //Debug.Log($"Pickable: {pickable.name}");
                         // Pick it
                         TossItem(pickable);
                     }
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Method for collecting item.
+    /// </summary>
+    /// <param name="item"></param>
+    private void CollectItem(CollectableItem item)
+    {
+        Debug.Log($"Item Collected!!!!");
+        itemCollected = true;
     }
 
     /// <summary>

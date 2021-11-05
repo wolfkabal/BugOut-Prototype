@@ -10,6 +10,7 @@ public class RigidBodyMovement : MonoBehaviour
     //[SerializeField] private LayerMask FloorMask;
     //[SerializeField] private Transform FeetTransform;
     [Space]
+    [SerializeField] private Vector3 CenterMass;
     [SerializeField] private float Speed;
     [SerializeField] private float JumpForce;
     [SerializeField] private float RotationSpeed;
@@ -19,6 +20,7 @@ public class RigidBodyMovement : MonoBehaviour
 
     private void FixedUpdate() {
         MovePlayer();
+        PlayerBody.centerOfMass = CenterMass;
     }
     
     void OnCollisionEnter(Collision other)

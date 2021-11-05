@@ -31,7 +31,7 @@ public class RigidBodyMovement : MonoBehaviour
         if (body == null || body.isKinematic)
             return;
 
-        Debug.Log(body.name);
+        Debug.Log($"Contact: {body.name}");
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit)

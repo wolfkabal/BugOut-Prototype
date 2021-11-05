@@ -30,7 +30,7 @@ public class RigidBodyMovement : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical"); 
-        Vector3 movement = new Vector3(horizontalInput, PlayerBody.transform.position.y, verticalInput).normalized;
+        Vector3 movement = new Vector3(horizontalInput, 0f, verticalInput).normalized;
 
         // Jump
         if (Input.GetKeyDown(KeyCode.Space))

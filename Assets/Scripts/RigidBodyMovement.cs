@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RigidBodyMovement : MonoBehaviour
@@ -14,6 +12,7 @@ public class RigidBodyMovement : MonoBehaviour
     [SerializeField] private float Speed;
     [SerializeField] private float JumpForce;
     [SerializeField] private float RotationSpeed;
+    [SerializeField] private float LiftForce;
     private bool isGrounded;
 
     private void Update() { }
@@ -26,8 +25,40 @@ public class RigidBodyMovement : MonoBehaviour
     void OnCollisionEnter(Collision other)
     {
         isGrounded = true;
+
+        Rigidbody body = other.collider.attachedRigidbody;
+        // no rigidbody
+        if (body == null || body.isKinematic)
+            return;
+
+        Debug.Log($"Contact: {body.name}");
     }
 
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Rigidbody body = hit.collider.attachedRigidbody;
+
+        // no rigidbody
+        if (body == null || body.isKinematic)
+            return;
+
+        Debug.Log(body.name);
+
+        // We don't want to push objects below us
+        if (hit.moveDirection.y < -0.3f)
+            return;
+
+        // Calculate push direction from move direction,
+        // we only push objects to the sides never up and down
+        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+        
+        // Apply the push
+        body.velocity = pushDir * LiftForce;
+    }
+
+    /// <summary>
+    /// Performs movement on the applied RigidBody
+    /// </summary>
     private void MovePlayer()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -50,13 +81,15 @@ public class RigidBodyMovement : MonoBehaviour
             return;
         }    
 
+        // Performs the rotation math. Gets the destination rotation Quarternion
         Quaternion targetRotation = Quaternion.LookRotation(movement);    
         targetRotation = Quaternion.RotateTowards(
-            transform.rotation,
-            targetRotation,
+            transform.rotation, //current player rotation
+            targetRotation, //target rotation
             RotationSpeed * Time.fixedDeltaTime); 
-
+        
+        PlayerBody.MoveRotation(targetRotation);
         PlayerBody.MovePosition(PlayerBody.position + movement * Speed * Time.fixedDeltaTime);
-        PlayerBody.MoveRotation(targetRotation);  
+          
     }
 }
